@@ -12,3 +12,10 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Message{
+  id          String  @id @default(uuid())
+  sender      String
+  content     String
+  createdAt   DateTime @default(now())
+}
