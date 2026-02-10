@@ -1,10 +1,6 @@
 import { Elysia } from "elysia";
 import { MessageModel } from "./model";
-
-type Message = {
-  sender: string;
-  content: string;
-};
+import { type Message } from "../utils";
 
 let messages: Message[] = [];
 
