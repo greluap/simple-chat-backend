@@ -1,25 +1,22 @@
-import { Elysia } from "elysia";
 import { MessageModel } from "./model";
-import { type Message } from "../utils";
+import { prisma, type Message } from "../utils";
+import { Elysia } from "elysia";
+import { Service } from "./service";
+
 
 let messages: Message[] = [];
+
 
 new Elysia({prefix: '/messages'})
   .post(
     "/",
-    ({ body, set }) => {
-      body: body;
+    async ({ body, set }) => {
 
-      if (body.content && body.sender != undefined && null) {
-        const message = {
-          sender: body.sender,
-          content: body.content,
-        };
-
-        messages.push(message);
-
+      if (body.content && body.sender != undefined) {
+        
         set.status = 201;
-        return message;
+        return  await Service.sendMessage({body});
+
       } else {
         set.status = 400;
         return null;
@@ -27,8 +24,8 @@ new Elysia({prefix: '/messages'})
     },
     { body: MessageModel.MessageSendBody },
   )
-  .get("/", ({ set }) => {
+  .get("/", async ({ set }) => {
     set.status = 200;
-    return messages;
+    return Service.getMessages();
   })
   .listen(3000);
