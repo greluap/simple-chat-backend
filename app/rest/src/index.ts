@@ -1,22 +1,16 @@
 import { MessageModel } from "./model";
-import { prisma, type Message } from "../utils";
+import { type Message } from "../../../utils";
 import { Elysia } from "elysia";
 import { Service } from "./service";
-
-
 let messages: Message[] = [];
 
-
-new Elysia({prefix: '/messages'})
+new Elysia({ prefix: "/messages" })
   .post(
     "/",
     async ({ body, set }) => {
-
       if (body.content && body.sender != undefined) {
-        
-        set.status = 201;
-        return  await Service.sendMessage({body});
-
+        set.status = 202;
+        return await Service.sendMessage({ body });
       } else {
         set.status = 400;
         return null;
