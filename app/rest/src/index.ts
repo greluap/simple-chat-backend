@@ -29,4 +29,3 @@ const app = new Elysia({ prefix: "/messages" })
   .listen(3000);
 
 console.log(`Server running at ${app.server?.hostname}:${app.server?.port}`);
-console.log("hi");

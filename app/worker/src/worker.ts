@@ -1,6 +1,6 @@
 import { Redis } from "ioredis";
 import type { CloudEvent } from "cloudevents";
-import { prisma, type Message } from "../../../utils";
+import { client, prisma, type Message } from "../../../utils";
 
 const redis = new Redis(6379, "localhost");
 
@@ -20,6 +20,11 @@ while (true) {
             ...message,
           },
         });
+
+        await client.set("chat_history", JSON.stringify(sentMessage), {
+          EX: 60,
+        });
+
         console.log("Done");
       } catch (e) {
         console.log("Fehlgeschlagen (fehlerhafter Datensatz) " + e);

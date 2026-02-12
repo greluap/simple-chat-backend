@@ -1,8 +1,12 @@
 import { Redis } from "ioredis";
 import { CloudEvent } from "cloudevents";
 import { v4 as uuidv4 } from "uuid";
+import { createClient, type RedisClientType } from "redis";
 
 const redis = new Redis(6379, "localhost");
+const client: RedisClientType = createClient({
+  url: "redis://localhost:6379",
+});
 export abstract class RedisFunction {
   static async enqueueMessage(payload: {}, source: string, type: string) {
     const event = new CloudEvent({

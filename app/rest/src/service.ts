@@ -1,4 +1,5 @@
 import {
+  client,
   CLOUD_EVENT_PATHS,
   CLOUD_EVENT_TYPES,
   prisma,
@@ -27,7 +28,19 @@ export abstract class Service {
   }
 
   static async getMessages() {
-    const messages = await prisma.message.findMany();
+    const value: string | null = await client.get("chat_history");
+    let messages: Message[];
+
+    if (value === null) {
+      const messages = await prisma.message.findMany();
+
+      await client.set("chat_history", JSON.stringify(messages), {
+        EX: 60,
+      });
+      return messages;
+    }
+
+    messages = JSON.parse(value);
     return messages;
   }
 
