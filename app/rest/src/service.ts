@@ -30,4 +30,9 @@ export abstract class Service {
     const messages = await prisma.message.findMany();
     return messages;
   }
+
+  static async deleteMessage() {
+    const message = await prisma.message.deleteMany();
+    return message;
+  }
 }

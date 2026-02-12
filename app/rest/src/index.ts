@@ -4,7 +4,7 @@ import { Elysia } from "elysia";
 import { Service } from "./service";
 let messages: Message[] = [];
 
-new Elysia({ prefix: "/messages" })
+const app = new Elysia({ prefix: "/messages" })
   .post(
     "/",
     async ({ body, set }) => {
@@ -22,4 +22,11 @@ new Elysia({ prefix: "/messages" })
     set.status = 200;
     return Service.getMessages();
   })
+  .delete("/", ({ set }) => {
+    Service.deleteMessage();
+    set.status = 200;
+  })
   .listen(3000);
+
+console.log(`Server running at ${app.server?.hostname}:${app.server?.port}`);
+console.log("hi");
