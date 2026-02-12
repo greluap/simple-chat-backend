@@ -6,7 +6,7 @@
   "devDependencies": {
     "@types/bun": "latest",
     "elysia": "^1.4.23",
-    "prisma": "^7.3.0"
+    "prisma": "^7.4.0"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -14,6 +14,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
+    "@types/node": "^25.2.3",
     "cloudevents": "^10.0.0",
     "dotenv": "^17.2.4",
     "ioredis": "^5.9.2",
@@ -21,6 +22,8 @@
     "uuid": "^13.0.0"
   },
   "scripts": {
-    "dev": "bun run src/index.ts"
+    "rest": "bun run app/rest/src/index.ts",
+    "worker": "bun run app/worker/src/worker.ts",
+    "dev": "concurrently --kill-others \"bun run --watch rest\" \"bun run --watch worker\""
   }
 }

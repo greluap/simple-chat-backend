@@ -1,7 +1,8 @@
-import { redis } from "bun";
+import { Redis } from "ioredis";
 import { CloudEvent } from "cloudevents";
 import { v4 as uuidv4 } from "uuid";
 
+const redis = new Redis(6379, "localhost");
 export abstract class RedisFunction {
   static async enqueueMessage(payload: {}, source: string, type: string) {
     const event = new CloudEvent({
