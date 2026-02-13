@@ -1,34 +1,39 @@
 import { Redis } from "ioredis";
 import type { CloudEvent } from "cloudevents";
-import { client, prisma, type Message } from "../../../utils";
+import { redisClient, prisma, type Message } from "../../../utils";
 
-const redis = new Redis(6379, "localhost");
+console.log(`Starting worker...`);
 
-console.log(`Starting worker`);
+const blockingRedis = new Redis("redis://localhost:6379");
 
-while (true) {
-  const result = await redis.blpop("message-inbox", 0);
-  if (result != undefined) {
-    const event: CloudEvent = JSON.parse(result[1]);
-    if (event.data != undefined) {
-      const message: Message = event.data;
+async function runWorker() {
+  console.log("worker....");
+  while (true) {
+    try {
+      const result = await blockingRedis.blpop("message-inbox", 0);
 
-      try {
-        console.log("Verarbeite Event ID: " + event.id);
-        const sentMessage = await prisma.message.create({
-          data: {
-            ...message,
-          },
-        });
+      if (result) {
+        const eventRaw = result[1];
+        const event: CloudEvent = JSON.parse(eventRaw);
 
-        await client.set("chat_history", JSON.stringify(sentMessage), {
-          EX: 60,
-        });
+        if (event.data) {
+          const messageData = event.data as Message;
 
-        console.log("Done");
-      } catch (e) {
-        console.log("Fehlgeschlagen (fehlerhafter Datensatz) " + e);
+          console.log("Verarbeite Event ID: " + event.id);
+
+          await prisma.message.create({
+            data: { ...messageData },
+          });
+
+          await redisClient.del("chat_history");
+
+          console.log("Nachricht gespeichert und Cache invalidiert.");
+        }
       }
+    } catch (e) {
+      console.error("Worker Fehler:", e);
     }
   }
 }
+
+runWorker();

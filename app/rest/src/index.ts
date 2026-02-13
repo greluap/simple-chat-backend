@@ -23,7 +23,7 @@ const app = new Elysia({ prefix: "/messages" })
     return Service.getMessages();
   })
   .delete("/", ({ set }) => {
-    Service.deleteMessage();
+    Service.deleteAllMessages();
     set.status = 200;
   })
   .listen(3000);

@@ -1,8 +1,8 @@
 import {
-  client,
   CLOUD_EVENT_PATHS,
   CLOUD_EVENT_TYPES,
   prisma,
+  redisClient,
   type Message,
 } from "../../../utils";
 import { RedisFunction } from "../../redis-cloudevent/src";
@@ -28,15 +28,13 @@ export abstract class Service {
   }
 
   static async getMessages() {
-    const value: string | null = await client.get("chat_history");
+    const value = await redisClient.get("chat_history");
     let messages: Message[];
 
-    if (value === null) {
+    if (!value) {
       const messages = await prisma.message.findMany();
 
-      await client.set("chat_history", JSON.stringify(messages), {
-        EX: 60,
-      });
+      await redisClient.set("chat_history", JSON.stringify(messages), "EX", 60);
       return messages;
     }
 
@@ -44,8 +42,9 @@ export abstract class Service {
     return messages;
   }
 
-  static async deleteMessage() {
+  static async deleteAllMessages() {
     const message = await prisma.message.deleteMany();
+    await redisClient.del("chat_history");
     return message;
   }
 }
